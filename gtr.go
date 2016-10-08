@@ -32,9 +32,9 @@ type testDirTree struct {
 }
 
 const (
-	bin  = "bin"
-	pika = "src/pika"
-	asm  = "src/asm"
+	bin  = "./bin"
+	pika = "./tests/pika"
+	asm  = "./tests/asm"
 
 	pikaExt = ".pika"
 	asmExt  = ".asm"
@@ -49,50 +49,50 @@ const (
 )
 
 var (
-	compiler      = []string{"-jar", "-ea ", bin + "/pika-compiler.jar"}
-	codegenerator = []string{"-jar", "-ea ", bin + "/pika-codegen.jar"}
-	optimizer     = []string{"-jar", "-ea ", bin + "/pika-optimizer.jar"}
+	compiler      = []string{"-ea", "-jar", bin + "/pika-compiler.jar"}
+	codegenerator = []string{"-ea", "-jar", bin + "/pika-codegen.jar"}
+	optimizer     = []string{"-ea", "-jar", bin + "/pika-optimizer.jar"}
 	emulator      = []string{bin + "/ASMEmu.exe"}
 
 	result = testDirTree{
 		build: testStorageDir{
-			codegenerator:       "result/build/codegenerator",
-			compiler:            "result/build/compiler",
-			optimizer:           "result/build/optimizer",
-			optimizerStandalone: "result/build/optimizer-standalone",
+			codegenerator:       "./result/build/codegenerator",
+			compiler:            "./result/build/compiler",
+			optimizer:           "./result/build/optimizer",
+			optimizerStandalone: "./result/build/optimizer-standalone",
 		},
 		run: testStorageDir{
-			codegenerator:       "result/run/codegenerator",
-			compiler:            "result/run/compiler",
-			optimizer:           "result/run/optimizer",
-			optimizerStandalone: "result/run/optimizer-standalone",
+			codegenerator:       "./result/run/codegenerator",
+			compiler:            "./result/run/compiler",
+			optimizer:           "./result/run/optimizer",
+			optimizerStandalone: "./result/run/optimizer-standalone",
 		},
 		asm: testStorageDir{
-			codegenerator:       "result/asm/codegenerator",
-			compiler:            "result/asm/compiler",
-			optimizer:           "result/asm/optimizer",
-			optimizerStandalone: "result/asm/optimizer-standalone",
+			codegenerator:       "./result/asm/codegenerator",
+			compiler:            "./result/asm/compiler",
+			optimizer:           "./result/asm/optimizer",
+			optimizerStandalone: "./result/asm/optimizer-standalone",
 		},
 	}
 
 	expect = testDirTree{
 		build: testStorageDir{
-			codegenerator:       "expect/build/codegenerator",
-			compiler:            "expect/build/compiler",
-			optimizer:           "expect/build/optimizer",
-			optimizerStandalone: "expect/build/optimizer-standalone",
+			codegenerator:       "./expect/build/codegenerator",
+			compiler:            "./expect/build/compiler",
+			optimizer:           "./expect/build/optimizer",
+			optimizerStandalone: "./expect/build/optimizer-standalone",
 		},
 		run: testStorageDir{
-			codegenerator:       "expect/run/codegenerator",
-			compiler:            "expect/run/compiler",
-			optimizer:           "expect/run/optimizer",
-			optimizerStandalone: "expect/run/optimizer-standalone",
+			codegenerator:       "./expect/run/codegenerator",
+			compiler:            "./expect/run/compiler",
+			optimizer:           "./expect/run/optimizer",
+			optimizerStandalone: "./expect/run/optimizer-standalone",
 		},
 		asm: testStorageDir{
-			codegenerator:       "expect/asm/codegenerator",
-			compiler:            "expect/asm/compiler",
-			optimizer:           "expect/asm/optimizer",
-			optimizerStandalone: "expect/asm/optimizer-standalone",
+			codegenerator:       "./expect/asm/codegenerator",
+			compiler:            "./expect/asm/compiler",
+			optimizer:           "./expect/asm/optimizer",
+			optimizerStandalone: "./expect/asm/optimizer-standalone",
 		},
 	}
 )
@@ -186,10 +186,10 @@ func main() {
 }
 
 func initDirs() {
-	mkdirIfNotExist("bin")
+	mkdirIfNotExist(bin)
 
-	mkdirIfNotExist("src/asm")
-	mkdirIfNotExist("src/pika")
+	mkdirIfNotExist(pika)
+	mkdirIfNotExist(asm)
 
 	// expect
 	mkdirIfNotExist(expect.asm.codegenerator)
@@ -259,7 +259,6 @@ func executeAll(count int,
 	cmd string, args []string) {
 	files := getAllFiles(inDir)
 	files = filterFiles(files, inExt)
-
 	var wg sync.WaitGroup
 	for i := 0; i <= count; i++ {
 		start, end := measureSlice(len(files), count, i)
@@ -311,6 +310,9 @@ func execute(cmd string, args []string) []byte {
 	task := exec.Command(cmd, args...)
 	var stdout, stderr bytes.Buffer
 	task.Stdout, task.Stderr = &stdout, &stderr
+	if cmd == wine {
+		task.Stderr = nil
+	}
 	task.Run()
 
 	return append(stdout.Bytes(), stderr.Bytes()...)
@@ -326,7 +328,7 @@ func batchCodeGen(count int) {
 	compareAllResults(count,
 		result.build.codegenerator,
 		expect.build.codegenerator,
-		pika)
+		result.build.codegenerator)
 }
 
 func batchRunUnoptimized(count int) {
@@ -538,7 +540,7 @@ func crashOnError(err error) {
 func filterOutFiles(in []os.FileInfo, ext string) []os.FileInfo {
 	files := make([]os.FileInfo, 0, len(in))
 	for _, file := range in {
-		if strings.Contains(file.Name(), ext) {
+		if !strings.Contains(file.Name(), ext) {
 			files = append(files, file)
 		}
 	}
