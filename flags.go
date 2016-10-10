@@ -110,10 +110,10 @@ func makeAcceptFlags(args []string) (acceptFlags, string) {
 		"test specified is a .asm file, default to .pika otherwise")
 
 	accept.BoolVar(&flags.all, "all", false,
-		"accept every test result run in the last testing round\n"+
+		"move result folder to expect\n"+
 			"\tsupersedes all other flags"+
-			"\tsaves old expect folder to .expect"+
-			"\told .expect does get deleted")
+			"\tsaves old expects to .expect folder as a backup"+
+			"\tanything previously in .expect gets deleted")
 
 	accept.Parse(args)
 	if len(accept.Args()) == 0 && flags.all == false {
