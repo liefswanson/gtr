@@ -142,7 +142,7 @@ func testCommand(clean, codegen, optimize, compile, optimizeStandalone, invertFl
 		batchRunCompiled(cores)
 	}
 	if optimizeStandalone {
-		color.Cyan("OPTIMIZING HAND WRITTEN ASM...")
+		color.Cyan("OPTIMIZING STANDALONE ASM...")
 		batchOptimizeStandalone(cores)
 		color.YellowString("RUNNING...")
 		batchRunOptimizedStandalone(cores)
