@@ -13,28 +13,22 @@ import (
 )
 
 func initDirs() {
-	mkdirIfNotExist(bin)
+	initBinDir()
+	initSourceDirs()
+	initExpectDirs()
+	initResultDirs()
+}
 
+func initBinDir() {
+	mkdirIfNotExist(bin)
+}
+
+func initSourceDirs() {
 	mkdirIfNotExist(pika)
 	mkdirIfNotExist(asm)
+}
 
-	// expect
-	mkdirIfNotExist(expect.asm.codegenerator)
-	mkdirIfNotExist(expect.asm.compiler)
-	mkdirIfNotExist(expect.asm.optimizer)
-	mkdirIfNotExist(expect.asm.optimizerStandalone)
-
-	mkdirIfNotExist(expect.build.codegenerator)
-	mkdirIfNotExist(expect.build.compiler)
-	mkdirIfNotExist(expect.build.optimizer)
-	mkdirIfNotExist(expect.build.optimizerStandalone)
-
-	mkdirIfNotExist(expect.run.codegenerator)
-	mkdirIfNotExist(expect.run.compiler)
-	mkdirIfNotExist(expect.run.optimizer)
-	mkdirIfNotExist(expect.run.optimizerStandalone)
-
-	// result
+func initResultDirs() {
 	mkdirIfNotExist(result.asm.codegenerator)
 	mkdirIfNotExist(result.asm.compiler)
 	mkdirIfNotExist(result.asm.optimizer)
@@ -49,6 +43,23 @@ func initDirs() {
 	mkdirIfNotExist(result.run.compiler)
 	mkdirIfNotExist(result.run.optimizer)
 	mkdirIfNotExist(result.run.optimizerStandalone)
+}
+
+func initExpectDirs() {
+	mkdirIfNotExist(expect.asm.codegenerator)
+	mkdirIfNotExist(expect.asm.compiler)
+	mkdirIfNotExist(expect.asm.optimizer)
+	mkdirIfNotExist(expect.asm.optimizerStandalone)
+
+	mkdirIfNotExist(expect.build.codegenerator)
+	mkdirIfNotExist(expect.build.compiler)
+	mkdirIfNotExist(expect.build.optimizer)
+	mkdirIfNotExist(expect.build.optimizerStandalone)
+
+	mkdirIfNotExist(expect.run.codegenerator)
+	mkdirIfNotExist(expect.run.compiler)
+	mkdirIfNotExist(expect.run.optimizer)
+	mkdirIfNotExist(expect.run.optimizerStandalone)
 }
 
 func cleanDirs() {
@@ -76,6 +87,12 @@ func cleanDir(dir string) {
 			err := os.Remove(buildPath(dir, file.Name()))
 			crashOnError(err)
 		}
+	}
+}
+
+func moveIfExists(path string, newPath string) {
+	if exists(path) {
+		os.Rename(path, newPath)
 	}
 }
 

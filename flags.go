@@ -35,9 +35,7 @@ type createFlags struct {
 }
 
 type acceptFlags struct {
-	run   bool
-	asm   bool
-	build bool
+	asm bool
 
 	all bool
 }
@@ -94,7 +92,7 @@ func makeCreateFlags(args []string) (createFlags, string) {
 	create.BoolVar(&flags.open, "open", false,
 		"opens the test which was just created in your default editor")
 	create.BoolVar(&flags.isAsm, "asm", false,
-		"creates the a new .asm test; will default to a .pika test otherwise")
+		"test specified is a .asm file, default to .pika otherwise")
 
 	create.Parse(args)
 	if len(create.Args()) == 0 {
@@ -107,14 +105,15 @@ func makeCreateFlags(args []string) (createFlags, string) {
 func makeAcceptFlags(args []string) (acceptFlags, string) {
 	flags := acceptFlags{}
 	accept := flag.NewFlagSet("accept", flag.ExitOnError)
-	accept.BoolVar(&flags.all, "all", false,
-		"accept every test result run in the last testing round")
-	accept.BoolVar(&flags.run, "run", false,
-		"accept the results for the run phase")
+
 	accept.BoolVar(&flags.asm, "asm", false,
-		"accept the results for the asm code output")
-	accept.BoolVar(&flags.build, "build", false,
-		"accept the output given during build phase")
+		"test specified is a .asm file, default to .pika otherwise")
+
+	accept.BoolVar(&flags.all, "all", false,
+		"accept every test result run in the last testing round\n"+
+			"\tsupersedes all other flags"+
+			"\tsaves old expect folder to .expect"+
+			"\told .expect does get deleted")
 
 	accept.Parse(args)
 	if len(accept.Args()) == 0 && flags.all == false {
