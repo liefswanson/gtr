@@ -30,11 +30,7 @@ func main() {
 		acceptCommand(flags, target)
 	case "init":
 		initDirs()
-	case "help":
-		fallthrough
-	case "-help":
-		fallthrough
-	case "--help":
+	case "help", "-help", "--help":
 		helpMessage()
 		os.Exit(0)
 	default:
