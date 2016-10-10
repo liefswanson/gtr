@@ -8,13 +8,12 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+
+	"github.com/fatih/color"
 )
 
-type testResult struct {
-	name   string
-	result bool
-}
-
+////////////////////////////////////////////////////////////////////////////////
+// convenience commands
 func batchCodeGen(count int) {
 	executeAll(count,
 		pika, pikaExt,
@@ -118,6 +117,9 @@ func batchRunOptimizedStandalone(count int) {
 		expect.run.optimizerStandalone,
 		result.asm.optimizerStandalone)
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// execution
 func executeAll(count int,
 	inDir string, inExt string,
 	outDir string, outExt string,
@@ -176,6 +178,8 @@ func execute(cmd string, args []string) []byte {
 	return append(stdout.Bytes(), stderr.Bytes()...)
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// comparison
 func compareAllResults(count int,
 	resultDir string, expectDir string, refDir string) {
 
@@ -191,22 +195,25 @@ func compareAllResults(count int,
 	}
 
 	passed := 0
-	failed := ""
+	failed := make([]string, 0, len(testFiles))
 	for _ = range testFiles {
 		test := <-results
 		if test.result {
 			passed++
 		} else {
-			failed += test.name + "\n"
+			failed = append(failed, test.name)
 		}
 	}
-	fmt.Println("passed: [", passed, "/", len(testFiles), "]")
-	if failed != "" {
-		fmt.Print("failed:\n", failed)
+	color.Green("passed: [", passed, "/", len(testFiles), "]")
+	if len(failed) != 0 {
+		color.Set(color.FgRed)
+		fmt.Print("failed:\n")
 	}
-
-	// TODO
-	// log failures to file
+	for _, name := range failed {
+		fmt.Println(name)
+	}
+	color.Unset()
+	// return passed, len(testFiles), failed
 }
 func compareEachResult(files []os.FileInfo, results chan testResult,
 	resultDir string, expectDir string) {
@@ -237,21 +244,8 @@ func compareResult(resultFilePath string, expectFilePath string) bool {
 		crashOnError(err)
 		result := string(resultRaw[:])
 
-		expectedLines := strings.Split(expected, "\n")
-		resultLines := strings.Split(result, "\n")
-		expected, result = "", ""
-
-		for _, line := range expectedLines {
-			if !strings.Contains(line, "logging.PikaLogger log") {
-				expected += line
-			}
-		}
-
-		for _, line := range resultLines {
-			if !strings.Contains(line, "logging.PikaLogger log") {
-				result += line
-			}
-		}
+		expected = stripLines(expected, loggingMessage)
+		result = stripLines(result, loggingMessage)
 
 		return strings.Compare(result, expected) == 0
 	} else if !exists(expectFilePath) && !exists(resultFilePath) {

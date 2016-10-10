@@ -1,18 +1,5 @@
 package main
 
-type testStorageDir struct {
-	codegenerator       string
-	compiler            string
-	optimizer           string
-	optimizerStandalone string
-}
-
-type testDirTree struct {
-	build testStorageDir
-	run   testStorageDir
-	asm   testStorageDir
-}
-
 const (
 	bin  = "./bin"
 	pika = "./tests/pika"
@@ -25,6 +12,8 @@ const (
 
 	java = "java"
 	wine = "wine"
+
+	loggingMessage = "logging.PikaLogger log"
 )
 
 var (

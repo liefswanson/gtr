@@ -129,14 +129,27 @@ func filterFiles(in []os.FileInfo, ext string) []os.FileInfo {
 	return files
 }
 
+func stripLines(input string, containing string) string {
+	lines := strings.Split(input, "\n")
+
+	result := ""
+	for _, line := range lines {
+		if !strings.Contains(line, containing) {
+			result += line + "\n"
+		}
+	}
+	return result
+}
+
 func helpMessage() {
 	fmt.Println("usage of gtr: gtr <command> [<args>]")
-
+	fmt.Println()
 	fmt.Println("gtr commands:")
 	fmt.Println("test:\t\trun tests")
 	fmt.Println("create:\t\tcreate a new test")
 	fmt.Println("view:\t\tview a specified test's results")
 	fmt.Println("accept:\t\taccept the current output of a test in the future")
-
+	fmt.Println("init:\t\tbuild the directory structure needed to run gtr here")
+	fmt.Println()
 	fmt.Println("see gtr <command> --help for details on that command")
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+
+	"github.com/fatih/color"
 )
 
 func main() {
@@ -16,14 +18,11 @@ func main() {
 		optimize           bool
 		optimizeStandalone bool
 
-		clean      bool
-		initialize bool
+		clean bool
 
 		invertFlags bool
 	)
 	test := flag.NewFlagSet("test", flag.ExitOnError)
-	test.BoolVar(&initialize, "init", false,
-		"Make the directory structure required for running tests")
 	test.BoolVar(&clean, "clean", false,
 		"Clean out the output directories before running tests")
 
@@ -38,7 +37,7 @@ func main() {
 	test.BoolVar(&optimizeStandalone, "optimizeStandalone", false,
 		"Optimize asm written explicitly for testing")
 
-	test.BoolVar(&invertFlags, "invertFlags", false,
+	test.BoolVar(&invertFlags, "invert", false,
 		"Inverts all flags, making them subtractive instead of additive")
 
 	// view flags
@@ -64,38 +63,46 @@ func main() {
 	accept.BoolVar(&all, "all", false,
 		"accept every test result run in the last testing round")
 
-	// create flags
-	create := flag.NewFlagSet("create", flag.ExitOnError)
-
 	if len(os.Args) == 1 {
 		helpMessage()
 		os.Exit(0)
 	}
 
-	switch os.Args[1] {
+	command := os.Args[1]
+	switch command {
 	case "test":
 		test.Parse(os.Args[2:])
+		testCommand(
+			clean,
+			codegen, optimize,
+			compile,
+			optimizeStandalone,
+			invertFlags)
 	case "view":
 		view.Parse(os.Args[2:])
 	case "create":
-		create.Parse(os.Args[2:])
+		// do creation tasks
 	case "accept":
 		accept.Parse(os.Args[2:])
+	case "init":
+		initDirs()
+	case "help":
+		fallthrough
 	case "-help":
-		helpMessage()
-		os.Exit(0)
+		fallthrough
 	case "--help":
 		helpMessage()
 		os.Exit(0)
 	default:
-		fmt.Println("invalid command " + os.Args[1])
+		color.Red("invalid command " + command)
 		helpMessage()
 		os.Exit(1)
 	}
 
-	cores := runtime.NumCPU()
-	runtime.GOMAXPROCS(cores + 1)
+	os.Exit(0)
+}
 
+func testCommand(clean, codegen, optimize, compile, optimizeStandalone, invertFlags bool) {
 	if invertFlags {
 		compile = !compile
 		codegen = !codegen
@@ -103,43 +110,38 @@ func main() {
 		optimizeStandalone = !optimizeStandalone
 
 		clean = !clean
-		initialize = !initialize
 	}
 
-	if initialize {
-		fmt.Print("INITIALIZING... ")
-		initDirs()
-		fmt.Println(" done")
-	}
+	cores := runtime.NumCPU()
+	runtime.GOMAXPROCS(cores + 1)
+
 	if clean {
 		fmt.Print("CLEANING... ")
 		cleanDirs()
 		fmt.Println(" done")
 	}
 	if codegen {
-		fmt.Println("GENERATING CODE...")
+		color.Cyan("GENERATING CODE...")
 		batchCodeGen(cores)
-		fmt.Println("RUNNING...")
+		color.Cyan("RUNNING...")
 		batchRunUnoptimized(cores)
 	}
 	if optimize {
-		fmt.Println("OPTIMIZING...")
+		color.Cyan("OPTIMIZING...")
 		batchOptimize(cores)
-		fmt.Println("RUNNING...")
+		color.Cyan("RUNNING...")
 		batchRunOptimized(cores)
 	}
 	if compile {
-		fmt.Println("GENERATING CODE + OPTIMIZING...")
+		color.Cyan("GENERATING CODE + OPTIMIZING...")
 		batchCompile(cores)
-		fmt.Println("RUNNING...")
+		color.Cyan("RUNNING...")
 		batchRunCompiled(cores)
 	}
 	if optimizeStandalone {
-		fmt.Println("OPTIMIZING HAND WRITTEN ASM...")
+		color.Cyan("OPTIMIZING HAND WRITTEN ASM...")
 		batchOptimizeStandalone(cores)
-		fmt.Println("RUNNING...")
+		color.Cyan("RUNNING...")
 		batchRunOptimizedStandalone(cores)
 	}
-
-	os.Exit(0)
 }
