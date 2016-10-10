@@ -10,6 +10,11 @@ import (
 	"sync"
 )
 
+type testResult struct {
+	name   string
+	result bool
+}
+
 func batchCodeGen(count int) {
 	executeAll(count,
 		pika, pikaExt,
