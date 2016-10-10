@@ -35,6 +35,7 @@ func acceptCommand(flags acceptFlags, testname string) {
 }
 
 func acceptAll() {
+	os.RemoveAll("./.expect")
 	os.Rename("./expect/", "./.expect/")
 	os.Rename("./result", "./expect")
 	initResultDirs()
