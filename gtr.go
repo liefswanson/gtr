@@ -123,25 +123,25 @@ func testCommand(clean, codegen, optimize, compile, optimizeStandalone, invertFl
 	if codegen {
 		color.Cyan("GENERATING CODE...")
 		batchCodeGen(cores)
-		color.Cyan("RUNNING...")
+		color.Yellow("RUNNING...")
 		batchRunUnoptimized(cores)
 	}
 	if optimize {
 		color.Cyan("OPTIMIZING...")
 		batchOptimize(cores)
-		color.Cyan("RUNNING...")
+		color.Yellow("RUNNING...")
 		batchRunOptimized(cores)
 	}
 	if compile {
 		color.Cyan("GENERATING CODE + OPTIMIZING...")
 		batchCompile(cores)
-		color.Cyan("RUNNING...")
+		color.Yellow("RUNNING...")
 		batchRunCompiled(cores)
 	}
 	if optimizeStandalone {
 		color.Cyan("OPTIMIZING HAND WRITTEN ASM...")
 		batchOptimizeStandalone(cores)
-		color.Cyan("RUNNING...")
+		color.YellowString("RUNNING...")
 		batchRunOptimizedStandalone(cores)
 	}
 }

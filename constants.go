@@ -10,16 +10,21 @@ const (
 	asmoExt = ".asmo"
 	txtExt  = ".txt"
 
-	java = "java"
-	wine = "wine"
+	java              = "java"
+	compilerName      = "pika-compiler.jar"
+	codegeneratorName = "pika-codegen.jar"
+	optimizerName     = "pika-optimizer.jar"
+	wine              = "wine"
 
 	loggingMessage = "logging.PikaLogger log"
 )
 
+// these are vars, but just as a technical restriction
+// they should be considered constants
 var (
-	compiler      = []string{"-ea", "-jar", bin + "/pika-compiler.jar"}
-	codegenerator = []string{"-ea", "-jar", bin + "/pika-codegen.jar"}
-	optimizer     = []string{"-ea", "-jar", bin + "/pika-optimizer.jar"}
+	compiler      = []string{"-ea", "-jar", bin + "/" + compilerName}
+	codegenerator = []string{"-ea", "-jar", bin + "/" + codegeneratorName}
+	optimizer     = []string{"-ea", "-jar", bin + "/" + optimizerName}
 	emulator      = []string{bin + "/ASMEmu.exe"}
 
 	result = testDirTree{

@@ -131,12 +131,12 @@ func executeAll(count int,
 	for i := 0; i <= count; i++ {
 		start, end := measureSlice(len(files), count, i)
 		filesSlice := files[start:end]
+		wg.Add(1)
 		go executeEach(filesSlice,
 			inDir, inExt,
 			outDir, outExt,
 			targetDir,
 			&wg, cmd, args)
-		wg.Add(1)
 	}
 	wg.Wait()
 }
@@ -204,7 +204,8 @@ func compareAllResults(count int,
 			failed = append(failed, test.name)
 		}
 	}
-	color.Green("passed: [", passed, "/", len(testFiles), "]")
+	green := color.New(color.FgGreen)
+	green.Println("passed: [", passed, "/", len(testFiles), "]")
 	if len(failed) != 0 {
 		color.Set(color.FgRed)
 		fmt.Print("failed:\n")
