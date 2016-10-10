@@ -62,7 +62,7 @@ func initExpectDirs() {
 	mkdirIfNotExist(expect.run.optimizerStandalone)
 }
 
-func cleanDirs() {
+func cleanResultDirs() {
 	cleanDir(result.asm.codegenerator)
 	cleanDir(result.asm.compiler)
 	cleanDir(result.asm.optimizer)

@@ -22,7 +22,7 @@ func testCommand(flags testFlags) {
 
 	if flags.clean {
 		fmt.Print("CLEANING...")
-		cleanDirs()
+		cleanResultDirs()
 		fmt.Println(" done")
 	}
 	if flags.codegen {
