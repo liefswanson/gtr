@@ -119,32 +119,36 @@ func testCommand(clean, codegen, optimize, compile, optimizeStandalone, invertFl
 	runtime.GOMAXPROCS(cores + 1)
 
 	if clean {
-		fmt.Print("CLEANING... ")
+		fmt.Print("CLEANING...")
 		cleanDirs()
 		fmt.Println(" done")
 	}
 	if codegen {
 		color.Cyan("GENERATING CODE...")
+		color.Yellow("building...")
 		batchCodeGen(cores)
-		color.Yellow("RUNNING...")
+		color.Yellow("running...")
 		batchRunUnoptimized(cores)
 	}
 	if optimize {
 		color.Cyan("OPTIMIZING...")
+		color.Yellow("building...")
 		batchOptimize(cores)
-		color.Yellow("RUNNING...")
+		color.Yellow("running...")
 		batchRunOptimized(cores)
 	}
 	if compile {
 		color.Cyan("COMPILING...")
+		color.Yellow("building...")
 		batchCompile(cores)
-		color.Yellow("RUNNING...")
+		color.Yellow("running...")
 		batchRunCompiled(cores)
 	}
 	if optimizeStandalone {
 		color.Cyan("OPTIMIZING STANDALONE ASM...")
+		color.Yellow("building...")
 		batchOptimizeStandalone(cores)
-		color.YellowString("RUNNING...")
+		color.Yellow("running...")
 		batchRunOptimizedStandalone(cores)
 	}
 }
