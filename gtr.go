@@ -101,6 +101,9 @@ func main() {
 
 	os.Exit(0)
 }
+func createCommand(testName string) {
+
+}
 
 func testCommand(clean, codegen, optimize, compile, optimizeStandalone, invertFlags bool) {
 	if invertFlags {
@@ -133,7 +136,7 @@ func testCommand(clean, codegen, optimize, compile, optimizeStandalone, invertFl
 		batchRunOptimized(cores)
 	}
 	if compile {
-		color.Cyan("GENERATING CODE + OPTIMIZING...")
+		color.Cyan("COMPILING...")
 		batchCompile(cores)
 		color.Yellow("RUNNING...")
 		batchRunCompiled(cores)
