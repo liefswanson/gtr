@@ -112,8 +112,8 @@ func makeAcceptFlags(args []string) (acceptFlags, string) {
 	accept.BoolVar(&flags.all, "all", false,
 		"move result folder to expect\n"+
 			"\tsupersedes all other flags"+
-			"\tsaves old expects to .expect folder as a backup"+
-			"\tanything previously in .expect gets deleted")
+			"\tsaves old expects to .backup folder"+
+			"\tanything previously in .backup gets deleted")
 
 	accept.Parse(args)
 	if len(accept.Args()) == 0 && flags.all == false {

@@ -5,6 +5,10 @@ const (
 	pika = "./tests/pika"
 	asm  = "./tests/asm"
 
+	expectDir = "./expect"
+	resultDir = "./result"
+	backupDir = "./.backup"
+
 	pikaExt = ".pika"
 	asmExt  = ".asm"
 	asmoExt = ".asmo"

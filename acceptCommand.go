@@ -21,29 +21,31 @@ func acceptCommand(flags acceptFlags, testname string) {
 		path = buildPath(pika, filename)
 	}
 
-	if exists(path) {
-		if flags.asm {
-			acceptOptimizedStandalone(testname)
-		} else {
-			acceptCodeGen(testname)
-			acceptOptimized(testname)
-			acceptCompile(testname)
-		}
-	} else {
+	if !exists(path) {
 		color.Magenta(path + " does not exist")
+		os.Exit(1)
+		return // not necessary, just to be explicit
+	}
+
+	if flags.asm {
+		acceptOptimizedStandalone(testname)
+	} else {
+		acceptCodeGen(testname)
+		acceptOptimized(testname)
+		acceptCompile(testname)
 	}
 }
 
 func acceptAll() {
-	os.RemoveAll("./.expect")
-	os.Rename("./expect/", "./.expect/")
-	os.Rename("./result", "./expect")
+	os.RemoveAll(backupDir)
+	os.Rename(expectDir, backupDir)
+	os.Rename(resultDir, expectDir)
 	initResultDirs()
 }
 
 func acceptCompile(testname string) {
-	old := buildPath(result.build.compiler, testname+txtExt)
-	new := buildPath(expect.build.compiler, testname+txtExt)
+	new := buildPath(result.build.compiler, testname+txtExt)
+	old := buildPath(expect.build.compiler, testname+txtExt)
 	moveIfExists(old, new)
 
 	new = buildPath(result.asm.compiler, testname+asmExt)
@@ -56,8 +58,8 @@ func acceptCompile(testname string) {
 }
 
 func acceptCodeGen(testname string) {
-	old := buildPath(result.build.codegenerator, testname+txtExt)
-	new := buildPath(expect.build.codegenerator, testname+txtExt)
+	new := buildPath(result.build.codegenerator, testname+txtExt)
+	old := buildPath(expect.build.codegenerator, testname+txtExt)
 	moveIfExists(old, new)
 
 	new = buildPath(result.asm.codegenerator, testname+asmExt)
@@ -70,8 +72,8 @@ func acceptCodeGen(testname string) {
 }
 
 func acceptOptimized(testname string) {
-	old := buildPath(result.build.optimizer, testname+txtExt)
-	new := buildPath(expect.build.optimizer, testname+txtExt)
+	new := buildPath(result.build.optimizer, testname+txtExt)
+	old := buildPath(expect.build.optimizer, testname+txtExt)
 	moveIfExists(old, new)
 
 	new = buildPath(result.asm.optimizer, testname+asmoExt)
@@ -84,8 +86,8 @@ func acceptOptimized(testname string) {
 }
 
 func acceptOptimizedStandalone(testname string) {
-	old := buildPath(result.build.optimizerStandalone, testname+txtExt)
-	new := buildPath(expect.build.optimizerStandalone, testname+txtExt)
+	new := buildPath(result.build.optimizerStandalone, testname+txtExt)
+	old := buildPath(expect.build.optimizerStandalone, testname+txtExt)
 	moveIfExists(old, new)
 
 	new = buildPath(result.asm.optimizerStandalone, testname+asmoExt)
