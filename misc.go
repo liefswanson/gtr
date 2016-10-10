@@ -142,14 +142,14 @@ func stripLines(input string, containing string) string {
 }
 
 func helpMessage() {
-	fmt.Println("usage of gtr: gtr <command> [<args>]")
+	fmt.Println("usage of gtr: gtr <command> <flags>* <target>?")
 	fmt.Println()
 	fmt.Println("gtr commands:")
 	fmt.Println("test:\t\trun tests")
-	fmt.Println("create:\t\tcreate a new test")
-	fmt.Println("view:\t\tview a specified test's results")
-	fmt.Println("accept:\t\taccept the current output of a test in the future")
-	fmt.Println("init:\t\tbuild the directory structure needed to run gtr here")
+	fmt.Println("create:\t\tcreate a new test, requires test name as <target>")
+	fmt.Println("view:\t\tview a specified test's results, requires test name as <target>")
+	fmt.Println("accept:\t\taccept the current output of a test in the future, may require test name as <target>")
+	fmt.Println("init:\t\tbuild the directory structure needed to run gtr in this directory")
 	fmt.Println()
-	fmt.Println("see gtr <command> --help for details on that command")
+	fmt.Println("see gtr <command> --help for details on that command's flags")
 }
