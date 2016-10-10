@@ -10,6 +10,8 @@ const (
 	asmoExt = ".asmo"
 	txtExt  = ".txt"
 
+	linuxOpen         = "xdg-open"
+	macOpen           = "open"
 	java              = "java"
 	compilerName      = "pika-compiler.jar"
 	codegeneratorName = "pika-codegen.jar"
@@ -17,6 +19,9 @@ const (
 	wine              = "wine"
 
 	loggingMessage = "logging.PikaLogger log"
+
+	basicAsmFile  = "Halt\n"
+	basicPikaFile = "exec {\n\n}\n"
 )
 
 // these are vars, but just as a technical restriction

@@ -5,7 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 func initDirs() {
@@ -152,4 +156,17 @@ func helpMessage() {
 	fmt.Println("init:\t\tbuild the directory structure needed to run gtr in this directory")
 	fmt.Println()
 	fmt.Println("see gtr <command> --help for details on that command's flags")
+}
+
+// not sure if this creates a zombie process, and should be double checked
+func openDefaultEditor(path string) {
+	fmt.Println(path)
+	switch runtime.GOOS {
+	case "darwin":
+		exec.Command(macOpen, path).Run()
+	case "linux":
+		exec.Command(linuxOpen, path).Run()
+	default:
+		color.Magenta("unfortunately \"-open\" only works on mac and linux")
+	}
 }

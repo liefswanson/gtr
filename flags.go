@@ -94,7 +94,7 @@ func makeCreateFlags(args []string) (createFlags, string) {
 	create.BoolVar(&flags.open, "open", false,
 		"opens the test which was just created in your default editor")
 	create.BoolVar(&flags.isAsm, "asm", false,
-		"creates the a new .asm test, will default to a .pika test otherwise")
+		"creates the a new .asm test; will default to a .pika test otherwise")
 
 	create.Parse(args)
 	if len(create.Args()) == 0 {
