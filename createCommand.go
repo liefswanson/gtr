@@ -10,7 +10,7 @@ func createCommand(flags createFlags, arg string) {
 	var path string
 	var contents []byte
 
-	if flags.isAsm {
+	if flags.asm {
 		filename := arg + asmExt
 		path = buildPath(asm, filename)
 		contents = []byte(basicAsmFile)
