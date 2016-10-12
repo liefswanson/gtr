@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -151,15 +152,15 @@ func filterFiles(in []os.FileInfo, ext string) []os.FileInfo {
 }
 
 func stripLines(input string, containing string) string {
-	lines := strings.Split(input, "\n")
+	lines := strings.SplitAfter(input, "\n")
 
-	result := ""
+	var buffer bytes.Buffer
 	for _, line := range lines {
 		if !strings.Contains(line, containing) {
-			result += line + "\n"
+			buffer.WriteString(line)
 		}
 	}
-	return result
+	return buffer.String()
 }
 
 func helpMessage() {
@@ -184,6 +185,6 @@ func openDefaultEditor(path string) {
 	case "linux":
 		exec.Command(linuxOpen, path).Run()
 	default:
-		color.Magenta("unfortunately \"-open\" only works on mac and linux")
+		color.Magenta("unfortunately -open only works on mac and linux")
 	}
 }
