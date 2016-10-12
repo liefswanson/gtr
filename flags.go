@@ -75,7 +75,7 @@ func makeViewFlags(args []string) (viewFlags, string) {
 	view.BoolVar(&flags.diff, "diff", false,
 		"view as a diff, instead of result and expectation separately")
 
-	view.BoolVar(&flags.test, "test", false,
+	view.BoolVar(&flags.test, "test-set", false,
 		"view the source of the test which was run")
 
 	view.StringVar(&flags.testSet, "testSet", "compiler",
@@ -98,7 +98,7 @@ func makeViewFlags(args []string) (viewFlags, string) {
 		"optimizer-standalone":
 		// do nothing
 	default:
-		color.Magenta("-testSet=" + flags.testSet + " is invalid")
+		color.Magenta("-test-set=" + flags.testSet + " is invalid")
 		os.Exit(1)
 	}
 
