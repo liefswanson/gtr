@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -14,29 +15,34 @@ func viewCommand(flags viewFlags, testname string) {
 	if flags.asm {
 		phase := "asm"
 		color.Cyan("ASM...")
-		viewOutput(phase, flags.set, testname, flags.asm, flags.diff)
+		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
 	if flags.build {
 		phase := "build"
 		color.Cyan("BUILD...")
-		viewOutput(phase, flags.set, testname, flags.asm, flags.diff)
+		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
 	if flags.run {
 		phase := "run"
 		color.Cyan("RUN...")
-		viewOutput(phase, flags.set, testname, flags.asm, flags.diff)
+		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
 }
 
 // TODO need to take into account asmo files
-// TODO need to strip timestamps from outputs when writing to file
-//      not when reading them in
-func viewOutput(phase, set, testname string, asm bool, diff bool) {
-	resultPath := buildPath(resultDir, phase, set, testname+txtExt)
-	expectPath := buildPath(expectDir, phase, set, testname+txtExt)
-	if asm {
-		resultPath = buildPath(resultDir, phase, set, testname+asmExt)
-		expectPath = buildPath(expectDir, phase, set, testname+asmExt)
+func viewOutput(phase, testSet, testname string, asm bool, diff bool) {
+	var resultPath, expectPath string
+	if phase == "asm" {
+		if testSet == "optimizer" || testSet == "optimizer-standalone" {
+			resultPath = buildPath(resultDir, phase, testSet, testname+asmoExt)
+			expectPath = buildPath(expectDir, phase, testSet, testname+asmoExt)
+		} else {
+			resultPath = buildPath(resultDir, phase, testSet, testname+asmExt)
+			expectPath = buildPath(expectDir, phase, testSet, testname+asmExt)
+		}
+	} else {
+		resultPath = buildPath(resultDir, phase, testSet, testname+txtExt)
+		expectPath = buildPath(expectDir, phase, testSet, testname+txtExt)
 	}
 
 	if !exists(resultPath) {
@@ -53,12 +59,8 @@ func viewOutput(phase, set, testname string, asm bool, diff bool) {
 
 	if diff {
 		color.Yellow("diff...")
-		gitDiff := exec.Command("git", "diff", "--no-index", resultPath, expectPath)
-		var stdOut bytes.Buffer
-		gitDiff.Stdout = &stdOut
-		gitDiff.Run()
-		// TODO need to recolor the output of git diff
-		fmt.Print(string(stdOut.Bytes()))
+		output := makeDiff(expectPath, resultPath)
+		printDiff(output)
 	} else {
 		exp, err := ioutil.ReadFile(expectPath)
 		crashOnError(err)
@@ -68,5 +70,37 @@ func viewOutput(phase, set, testname string, asm bool, diff bool) {
 		fmt.Print(string(exp))
 		color.Yellow("result...")
 		fmt.Print(string(res))
+	}
+}
+
+func makeDiff(expectPath, resultPath string) string {
+	gitDiff := exec.Command("git", "diff", "--no-index", expectPath, resultPath)
+	var stdOut bytes.Buffer
+	gitDiff.Stdout = &stdOut
+	gitDiff.Run()
+	return string(stdOut.Bytes())
+}
+
+func printDiff(diff string) {
+	lines := strings.Split(diff, "\n")
+	if len(lines) < 4 {
+		return
+	}
+	for _, line := range lines[2:] {
+		if len(line) == 0 {
+			continue
+		}
+		r := line[0]
+		lightBlue := color.New(color.FgHiBlue)
+		switch r {
+		case '+':
+			color.Green(line)
+		case '-':
+			color.Red(line)
+		case '@':
+			lightBlue.Println(line)
+		default:
+			fmt.Println(line)
+		}
 	}
 }

@@ -156,12 +156,16 @@ func executeEach(files []os.FileInfo,
 			completeArgs = append(completeArgs, targetPath)
 		}
 
-		toWrite := execute(cmd, completeArgs)
+		bytesToWrite := execute(cmd, completeArgs)
 
 		outputFilename := replaceExtension(file.Name(), outExt)
 		outputFilename = buildPath(outDir, outputFilename)
 
-		ioutil.WriteFile(outputFilename, toWrite, 0777)
+		toWrite := string(bytesToWrite)
+		toWrite = stripLines(toWrite, loggingMessage)
+
+		bytesToWrite = []byte(toWrite)
+		ioutil.WriteFile(outputFilename, bytesToWrite, 0777)
 	}
 	wg.Done()
 }
@@ -239,14 +243,11 @@ func compareResult(resultFilePath string, expectFilePath string) bool {
 	if exists(expectFilePath) && exists(resultFilePath) {
 		expectedRaw, err := ioutil.ReadFile(expectFilePath)
 		crashOnError(err)
-		expected := string(expectedRaw[:])
+		expected := string(expectedRaw)
 
 		resultRaw, err := ioutil.ReadFile(resultFilePath)
 		crashOnError(err)
-		result := string(resultRaw[:])
-
-		expected = stripLines(expected, loggingMessage)
-		result = stripLines(result, loggingMessage)
+		result := string(resultRaw)
 
 		return strings.Compare(result, expected) == 0
 	} else if !exists(expectFilePath) && !exists(resultFilePath) {

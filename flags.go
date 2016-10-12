@@ -22,8 +22,8 @@ type testFlags struct {
 }
 
 type viewFlags struct {
-	test bool
-	set  string
+	test    bool
+	testSet string
 
 	run   bool
 	asm   bool
@@ -78,7 +78,7 @@ func makeViewFlags(args []string) (viewFlags, string) {
 	view.BoolVar(&flags.test, "test", false,
 		"view the source of the test which was run")
 
-	view.StringVar(&flags.set, "set", "compiler",
+	view.StringVar(&flags.testSet, "testSet", "compiler",
 		"particular set of tests to view\n"+
 			"\tvalues:\n"+
 			"\tcodegenerator, compiler, optimizer, optimizer-standalone\n")
@@ -91,11 +91,14 @@ func makeViewFlags(args []string) (viewFlags, string) {
 		"compare results of the build phase of testing")
 
 	view.Parse(args)
-	switch flags.set {
-	case "compiler", "codegenerator", "optimizer", "optimizer-standalone":
+	switch flags.testSet {
+	case "compiler",
+		"codegenerator",
+		"optimizer",
+		"optimizer-standalone":
 		// do nothing
 	default:
-		color.Magenta("-set=" + flags.set + " is invalid")
+		color.Magenta("-testSet=" + flags.testSet + " is invalid")
 		os.Exit(1)
 	}
 
