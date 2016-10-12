@@ -15,10 +15,10 @@ func acceptCommand(flags acceptFlags, testname string) {
 	var path string
 	if flags.asm {
 		filename := testname + asmExt
-		path = buildPath(asm, filename)
+		path = buildPath(asmDir, filename)
 	} else {
 		filename := testname + pikaExt
-		path = buildPath(pika, filename)
+		path = buildPath(pikaDir, filename)
 	}
 
 	if !exists(path) {

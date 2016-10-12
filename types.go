@@ -13,7 +13,9 @@ type testStorageDir struct {
 }
 
 type testDirTree struct {
-	build testStorageDir
-	run   testStorageDir
-	asm   testStorageDir
+	build  testStorageDir
+	run    testStorageDir
+	asm    testStorageDir
+	buildo testStorageDir
+	asmo   testStorageDir
 }

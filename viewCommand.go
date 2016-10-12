@@ -27,6 +27,15 @@ func viewCommand(flags viewFlags, testname string) {
 		color.Cyan("RUN...")
 		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
+	if flags.asmo {
+		if flags.testSet == "codegenerator" {
+			color.Magenta("there is no reoptimize phase for the codegenerator")
+			os.Exit(1)
+		}
+		phase := "asmo"
+		color.Cyan("ASMO...")
+		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
+	}
 }
 
 // TODO need to take into account asmo files

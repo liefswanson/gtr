@@ -13,12 +13,12 @@ func testCommand(flags testFlags) {
 		flags.codegen = !flags.codegen
 		flags.optimize = !flags.optimize
 		flags.optimizeStandalone = !flags.optimizeStandalone
+		flags.reoptimize = !flags.reoptimize
 
 		flags.clean = !flags.clean
 	}
 
-	cores := runtime.NumCPU()
-	runtime.GOMAXPROCS(cores + 1)
+	runtime.GOMAXPROCS(flags.threads)
 
 	if flags.clean {
 		fmt.Print("CLEANING...")
@@ -28,29 +28,41 @@ func testCommand(flags testFlags) {
 	if flags.codegen {
 		color.Cyan("GENERATING CODE...")
 		color.Yellow("building...")
-		batchCodeGen(cores)
+		batchCodeGen(flags.threads)
 		color.Yellow("running...")
-		batchRunUnoptimized(cores)
+		batchRunUnoptimized(flags.threads)
 	}
 	if flags.optimize {
 		color.Cyan("OPTIMIZING...")
 		color.Yellow("building...")
-		batchOptimize(cores)
+		batchOptimize(flags.threads)
 		color.Yellow("running...")
-		batchRunOptimized(cores)
+		batchRunOptimized(flags.threads)
+		if flags.reoptimize {
+			color.Yellow("reoptimizing...")
+			batchReoptimizeOptimize(flags.threads)
+		}
 	}
 	if flags.compile {
 		color.Cyan("COMPILING...")
 		color.Yellow("building...")
-		batchCompile(cores)
+		batchCompile(flags.threads)
 		color.Yellow("running...")
-		batchRunCompiled(cores)
+		batchRunCompiled(flags.threads)
+		if flags.reoptimize {
+			color.Yellow("reoptimizing...")
+			batchReoptimizeCompile(flags.threads)
+		}
 	}
 	if flags.optimizeStandalone {
 		color.Cyan("OPTIMIZING STANDALONE ASM...")
 		color.Yellow("building...")
-		batchOptimizeStandalone(cores)
+		batchOptimizeStandalone(flags.threads)
 		color.Yellow("running...")
-		batchRunOptimizedStandalone(cores)
+		batchRunOptimizedStandalone(flags.threads)
+		if flags.reoptimize {
+			color.Yellow("reoptimizing...")
+			batchOptimizeStandalone(flags.threads)
+		}
 	}
 }

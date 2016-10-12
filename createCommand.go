@@ -12,11 +12,11 @@ func createCommand(flags createFlags, arg string) {
 
 	if flags.asm {
 		filename := arg + asmExt
-		path = buildPath(asm, filename)
+		path = buildPath(asmDir, filename)
 		contents = []byte(basicAsmFile)
 	} else {
 		filename := arg + pikaExt
-		path = buildPath(pika, filename)
+		path = buildPath(pikaDir, filename)
 		contents = []byte(basicPikaFile)
 	}
 

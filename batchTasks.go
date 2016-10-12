@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
+	"sort"
 	"sync"
 
 	"github.com/fatih/color"
@@ -16,7 +16,7 @@ import (
 // convenience commands
 func batchCodeGen(count int) {
 	executeAll(count,
-		pika, pikaExt,
+		pikaDir, pikaExt,
 		result.build.codegenerator, txtExt,
 		result.asm.codegenerator,
 		java, codegenerator)
@@ -24,7 +24,8 @@ func batchCodeGen(count int) {
 	compareAllResults(count,
 		result.build.codegenerator,
 		expect.build.codegenerator,
-		result.build.codegenerator)
+		result.build.codegenerator,
+		txtExt)
 }
 
 func batchRunUnoptimized(count int) {
@@ -37,7 +38,8 @@ func batchRunUnoptimized(count int) {
 	compareAllResults(count,
 		result.run.codegenerator,
 		expect.run.codegenerator,
-		result.asm.codegenerator)
+		result.asm.codegenerator,
+		txtExt)
 }
 
 func batchOptimize(count int) {
@@ -50,7 +52,23 @@ func batchOptimize(count int) {
 	compareAllResults(count,
 		result.build.optimizer,
 		expect.build.optimizer,
-		result.asm.codegenerator)
+		result.asm.codegenerator,
+		txtExt)
+}
+
+// TODO reoptimize
+func batchReoptimizeOptimize(count int) {
+	executeAll(count,
+		result.asm.optimizer, asmoExt,
+		result.buildo.optimizer, txtExt,
+		result.asmo.optimizer,
+		java, optimizer)
+
+	compareAllResults(count,
+		result.asmo.optimizer,
+		expect.asmo.optimizer,
+		result.asm.optimizer,
+		asmoExt)
 }
 
 func batchRunOptimized(count int) {
@@ -63,12 +81,13 @@ func batchRunOptimized(count int) {
 	compareAllResults(count,
 		result.run.optimizer,
 		expect.run.optimizer,
-		result.asm.optimizer)
+		result.asm.optimizer,
+		txtExt)
 }
 
 func batchCompile(count int) {
 	executeAll(count,
-		pika, pikaExt,
+		pikaDir, pikaExt,
 		result.build.compiler, txtExt,
 		result.asm.compiler,
 		java, compiler)
@@ -76,7 +95,23 @@ func batchCompile(count int) {
 	compareAllResults(count,
 		result.build.compiler,
 		expect.build.compiler,
-		result.asm.compiler)
+		result.asm.compiler,
+		txtExt)
+}
+
+// TODO
+func batchReoptimizeCompile(count int) {
+	executeAll(count,
+		result.asm.compiler, asmExt,
+		result.buildo.compiler, txtExt,
+		result.asmo.compiler,
+		java, optimizer)
+
+	compareAllResults(count,
+		result.asmo.compiler,
+		expect.asmo.compiler,
+		result.asm.compiler,
+		asmoExt)
 }
 
 func batchRunCompiled(count int) {
@@ -89,12 +124,13 @@ func batchRunCompiled(count int) {
 	compareAllResults(count,
 		result.run.compiler,
 		expect.run.compiler,
-		result.asm.compiler)
+		result.asm.compiler,
+		txtExt)
 }
 
 func batchOptimizeStandalone(count int) {
 	executeAll(count,
-		asm, asmExt,
+		asmDir, asmExt,
 		result.build.optimizerStandalone, txtExt,
 		result.asm.optimizerStandalone,
 		java, optimizer)
@@ -102,7 +138,23 @@ func batchOptimizeStandalone(count int) {
 	compareAllResults(count,
 		result.build.optimizerStandalone,
 		expect.build.optimizerStandalone,
-		result.asm.optimizerStandalone)
+		result.asm.optimizerStandalone,
+		txtExt)
+}
+
+// TODO
+func batchReoptimizeOptimizeStandalone(count int) {
+	executeAll(count,
+		result.asm.optimizerStandalone, asmoExt,
+		result.buildo.optimizerStandalone, txtExt,
+		result.asmo.optimizerStandalone,
+		java, optimizer)
+
+	compareAllResults(count,
+		result.asmo.optimizerStandalone,
+		expect.asmo.optimizerStandalone,
+		result.asm.optimizerStandalone,
+		asmoExt)
 }
 
 func batchRunOptimizedStandalone(count int) {
@@ -115,7 +167,8 @@ func batchRunOptimizedStandalone(count int) {
 	compareAllResults(count,
 		result.run.optimizerStandalone,
 		expect.run.optimizerStandalone,
-		result.asm.optimizerStandalone)
+		result.asm.optimizerStandalone,
+		txtExt)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,11 +180,12 @@ func executeAll(count int,
 	cmd string, args []string) {
 	files := getAllFiles(inDir)
 	files = filterFiles(files, inExt)
+
 	var wg sync.WaitGroup
-	for i := 0; i <= count; i++ {
+	wg.Add(count)
+	for i := 0; i < count; i++ {
 		start, end := measureSlice(len(files), count, i)
 		filesSlice := files[start:end]
-		wg.Add(1)
 		go executeEach(filesSlice,
 			inDir, inExt,
 			outDir, outExt,
@@ -185,7 +239,7 @@ func execute(cmd string, args []string) []byte {
 ////////////////////////////////////////////////////////////////////////////////
 // comparison
 func compareAllResults(count int,
-	resultDir string, expectDir string, refDir string) {
+	resultDir, expectDir, refDir, ext string) {
 
 	temp := getAllFiles(refDir)
 	testFiles := filterOutFiles(temp, ".gitignore")
@@ -195,7 +249,7 @@ func compareAllResults(count int,
 	for i := 0; i < count; i++ {
 		start, end := measureSlice(len(testFiles), count, i)
 		slice := testFiles[start:end]
-		go compareEachResult(slice, results, resultDir, expectDir)
+		go compareEachResult(slice, results, resultDir, expectDir, ext)
 	}
 
 	passed := 0
@@ -208,25 +262,31 @@ func compareAllResults(count int,
 			failed = append(failed, test.name)
 		}
 	}
+	sort.Strings(failed)
+
 	green := color.New(color.FgGreen)
-	green.Println("passed: [", passed, "/", len(testFiles), "]")
-	if len(failed) != 0 {
-		color.Set(color.FgRed)
-		fmt.Print("failed:\n")
+	total := len(testFiles)
+	green.Println("passed: [", passed, "/", total, "]")
+
+	if len(failed) == 0 {
+		return
 	}
-	for _, name := range failed {
-		fmt.Println(name)
+
+	color.Set(color.FgRed)
+	fmt.Println("failed:")
+	for _, testName := range failed {
+		fmt.Println(testName)
 	}
 	color.Unset()
-	// return passed, len(testFiles), failed
 }
+
 func compareEachResult(files []os.FileInfo, results chan testResult,
-	resultDir string, expectDir string) {
+	resultDir, expectDir, ext string) {
 	for _, file := range files {
-		resultFileName := replaceExtension(file.Name(), txtExt)
+		resultFileName := replaceExtension(file.Name(), ext)
 		resultFilePath := buildPath(resultDir, resultFileName)
 
-		expectFileName := replaceExtension(file.Name(), txtExt)
+		expectFileName := replaceExtension(file.Name(), ext)
 		expectFilePath := buildPath(expectDir, expectFileName)
 
 		results <- testResult{
@@ -235,32 +295,29 @@ func compareEachResult(files []os.FileInfo, results chan testResult,
 	}
 }
 
-// the stripping of the logging lines might need to happen when writing
-// rather than during reading as it does here
-// it will allow the use of diff in that case
 func compareResult(resultFilePath string, expectFilePath string) bool {
 
 	if exists(expectFilePath) && exists(resultFilePath) {
-		expectedRaw, err := ioutil.ReadFile(expectFilePath)
+		expectRaw, err := ioutil.ReadFile(expectFilePath)
 		crashOnError(err)
-		expected := string(expectedRaw)
+		expect := string(expectRaw)
 
 		resultRaw, err := ioutil.ReadFile(resultFilePath)
 		crashOnError(err)
 		result := string(resultRaw)
 
-		return strings.Compare(result, expected) == 0
+		return result == expect
 	} else if !exists(expectFilePath) && !exists(resultFilePath) {
 		return true
 	}
 	return false
 }
 
-func measureSlice(size int, total int, current int) (int, int) {
-	start := current * size / total
-	end := (current + 1) * size / total
-	if end > size {
-		end = size
+func measureSlice(length int, slices int, sliceNum int) (int, int) {
+	start := sliceNum * length / slices
+	end := (sliceNum + 1) * length / slices
+	if end > length {
+		end = length
 	}
 	return start, end
 }

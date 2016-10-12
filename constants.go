@@ -1,9 +1,9 @@
 package main
 
 const (
-	bin  = "./bin"
-	pika = "./tests/pika"
-	asm  = "./tests/asm"
+	binDir  = "./bin"
+	pikaDir = "./tests/pika"
+	asmDir  = "./tests/asm"
 
 	expectDir = "./expect"
 	resultDir = "./result"
@@ -14,8 +14,7 @@ const (
 	asmoExt = ".asmo"
 	txtExt  = ".txt"
 
-	linuxOpen         = "xdg-open"
-	macOpen           = "open"
+	open              = "open"
 	java              = "java"
 	compilerName      = "pika-compiler.jar"
 	codegeneratorName = "pika-codegen.jar"
@@ -31,11 +30,12 @@ const (
 // these are vars, but just as a technical restriction
 // they should be considered constants
 var (
-	compiler      = []string{"-ea", "-jar", bin + "/" + compilerName}
-	codegenerator = []string{"-ea", "-jar", bin + "/" + codegeneratorName}
-	optimizer     = []string{"-ea", "-jar", bin + "/" + optimizerName}
-	emulator      = []string{bin + "/ASMEmu.exe"}
+	compiler      = []string{"-ea", "-jar", binDir + "/" + compilerName}
+	codegenerator = []string{"-ea", "-jar", binDir + "/" + codegeneratorName}
+	optimizer     = []string{"-ea", "-jar", binDir + "/" + optimizerName}
+	emulator      = []string{binDir + "/ASMEmu.exe"}
 
+	// TODO reoptimize
 	result = testDirTree{
 		build: testStorageDir{
 			codegenerator:       "./result/build/codegenerator",
@@ -54,6 +54,18 @@ var (
 			compiler:            "./result/asm/compiler",
 			optimizer:           "./result/asm/optimizer",
 			optimizerStandalone: "./result/asm/optimizer-standalone",
+		},
+		buildo: testStorageDir{
+			codegenerator:       "",
+			compiler:            "./result/buildo/compiler",
+			optimizer:           "./result/buildo/optimizer",
+			optimizerStandalone: "./result/buildo/optimizer-standalone",
+		},
+		asmo: testStorageDir{
+			codegenerator:       "",
+			compiler:            "./result/asmo/compiler",
+			optimizer:           "./result/asmo/optimizer",
+			optimizerStandalone: "./result/asmo/optimizer-standalone",
 		},
 	}
 
@@ -75,6 +87,18 @@ var (
 			compiler:            "./expect/asm/compiler",
 			optimizer:           "./expect/asm/optimizer",
 			optimizerStandalone: "./expect/asm/optimizer-standalone",
+		},
+		buildo: testStorageDir{
+			codegenerator:       "",
+			compiler:            "./expect/buildo/compiler",
+			optimizer:           "./expect/buildo/optimizer",
+			optimizerStandalone: "./expect/buildo/optimizer-standalone",
+		},
+		asmo: testStorageDir{
+			codegenerator:       "",
+			compiler:            "./expect/asmo/compiler",
+			optimizer:           "./expect/asmo/optimizer",
+			optimizerStandalone: "./expect/asmo/optimizer-standalone",
 		},
 	}
 )
