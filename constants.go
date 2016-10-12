@@ -14,6 +14,11 @@ const (
 	asmoExt = ".asmo"
 	txtExt  = ".txt"
 
+	build = "build"
+	asm   = "asm"
+	run   = "run"
+	asmo  = "asmo"
+
 	open              = "open"
 	java              = "java"
 	compilerName      = "pika-compiler.jar"

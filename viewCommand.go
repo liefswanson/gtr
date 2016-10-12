@@ -13,17 +13,17 @@ import (
 
 func viewCommand(flags viewFlags, testname string) {
 	if flags.asm {
-		phase := "asm"
+		phase := asm
 		color.Cyan("ASM...")
 		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
 	if flags.build {
-		phase := "build"
+		phase := build
 		color.Cyan("BUILD...")
 		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
 	if flags.run {
-		phase := "run"
+		phase := run
 		color.Cyan("RUN...")
 		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
@@ -32,17 +32,18 @@ func viewCommand(flags viewFlags, testname string) {
 			color.Magenta("there is no reoptimize phase for the codegenerator")
 			os.Exit(1)
 		}
-		phase := "asmo"
+		phase := asmo
 		color.Cyan("ASMO...")
 		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
 	}
 }
 
 // TODO need to take into account asmo files
-func viewOutput(phase, testSet, testname string, asm bool, diff bool) {
+func viewOutput(phase, testSet, testname string, isAsm bool, diff bool) {
 	var resultPath, expectPath string
-	if phase == "asm" {
-		if testSet == "optimizer" || testSet == "optimizer-standalone" {
+	if phase == asm || phase == asmo {
+		if testSet == "optimizer" || testSet == "optimizer-standalone" ||
+			phase == asmo {
 			resultPath = buildPath(resultDir, phase, testSet, testname+asmoExt)
 			expectPath = buildPath(expectDir, phase, testSet, testname+asmoExt)
 		} else {
