@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -201,5 +202,9 @@ func helpMessage() {
 
 // not sure if this creates a zombie process, and should be double checked
 func openDefaultEditor(path string) {
-	exec.Command(open, path).Run()
+	if runtime.GOOS == "darwin" {
+		exec.Command(open, path).Run()
+	} else if runtime.GOOS == "linux" {
+		exec.Command(xdgOpen, path).Run()
+	}
 }

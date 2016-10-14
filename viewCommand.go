@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"strings"
 
@@ -30,7 +29,7 @@ func viewCommand(flags viewFlags, testname string) {
 	if flags.asmo {
 		if flags.testSet == "codegenerator" {
 			color.Magenta("there is no reoptimize phase for the codegenerator")
-			os.Exit(1)
+			return
 		}
 		phase := asmo
 		color.Cyan("ASMO...")
@@ -55,31 +54,47 @@ func viewOutput(phase, testSet, testname string, isAsm bool, diff bool) {
 		expectPath = buildPath(expectDir, phase, testSet, testname+txtExt)
 	}
 
-	if !exists(resultPath) {
-		color.Magenta("there is no result set for " + testname)
-		color.Magenta(resultPath + " does not exist")
-		os.Exit(1)
-	}
-
-	if !exists(expectPath) {
-		color.Magenta("there is no expectation set for " + testname)
-		color.Magenta(expectPath + " does not exist")
-		os.Exit(1)
-	}
-
 	if diff {
 		color.Yellow("diff...")
-		output := makeDiff(expectPath, resultPath)
-		printDiff(output)
+		if exists(resultPath) && exists(expectPath) {
+			output := makeDiff(expectPath, resultPath)
+			printDiff(output)
+		}
+
+		if !exists(expectPath) {
+			color.Magenta("there is no expectation set for " + testname)
+			color.Magenta(expectPath + " does not exist")
+		}
+
+		if !exists(resultPath) {
+			color.Magenta("there is no result set for " + testname)
+			color.Magenta(resultPath + " does not exist")
+		}
+
 	} else {
-		exp, err := ioutil.ReadFile(expectPath)
-		crashOnError(err)
-		res, err := ioutil.ReadFile(resultPath)
-		crashOnError(err)
 		color.Yellow("expect...")
-		fmt.Print(string(exp))
+		if !exists(expectPath) {
+			color.Magenta("there is no expectation set for " + testname)
+			color.Magenta(expectPath + " does not exist")
+		} else {
+			exp, err := ioutil.ReadFile(expectPath)
+			crashOnError(err)
+
+			fmt.Print(string(exp))
+		}
+
 		color.Yellow("result...")
-		fmt.Print(string(res))
+		if !exists(resultPath) {
+			color.Magenta("there is no result set for " + testname)
+			color.Magenta(resultPath + " does not exist")
+		} else {
+			res, err := ioutil.ReadFile(resultPath)
+			crashOnError(err)
+
+			fmt.Print(string(res))
+
+		}
+
 	}
 }
 

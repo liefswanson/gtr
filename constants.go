@@ -20,6 +20,7 @@ const (
 	asmo  = "asmo"
 
 	open              = "open"
+	xdgOpen           = "xdg-open"
 	java              = "java"
 	compilerName      = "pika-compiler.jar"
 	codegeneratorName = "pika-codegen.jar"
