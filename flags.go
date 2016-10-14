@@ -92,7 +92,7 @@ func makeViewFlags(args []string) (viewFlags, string) {
 	view.BoolVar(&flags.test, "test", false,
 		"view the source of the test which was run")
 
-	view.StringVar(&flags.testSet, "test-set", "compiler",
+	view.StringVar(&flags.testSet, "test-set", "optimizer",
 		"particular set of tests to view\n"+
 			"\tvalues:\n"+
 			"\tcodegenerator, compiler, optimizer, optimizer-standalone")
