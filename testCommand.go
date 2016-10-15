@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"github.com/fatih/color"
 )
@@ -20,6 +21,7 @@ func testCommand(flags testFlags) {
 
 	runtime.GOMAXPROCS(flags.threads)
 
+	start := time.Now().UnixNano()
 	if flags.clean {
 		fmt.Print("CLEANING...")
 		cleanResultDirs()
@@ -65,4 +67,10 @@ func testCommand(flags testFlags) {
 			batchOptimizeStandalone(flags.threads)
 		}
 	}
+	end := time.Now().UnixNano()
+	delta := end - start
+	seconds := delta / (1000000000)
+	fraction := delta % (1000000000)
+	readable := fmt.Sprintf("%d.%d", seconds, fraction)
+	fmt.Println("completed in", readable, "seconds")
 }
