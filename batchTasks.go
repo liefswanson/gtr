@@ -24,7 +24,7 @@ func batchCodeGen(count int) {
 	compareAllResults(count,
 		result.build.codegenerator,
 		expect.build.codegenerator,
-		result.build.codegenerator,
+		pikaDir,
 		txtExt)
 }
 
@@ -95,7 +95,7 @@ func batchCompile(count int) {
 	compareAllResults(count,
 		result.build.compiler,
 		expect.build.compiler,
-		result.asm.compiler,
+		pikaDir,
 		txtExt)
 }
 
@@ -241,8 +241,9 @@ func execute(cmd string, args []string) []byte {
 func compareAllResults(count int,
 	resultDir, expectDir, refDir, ext string) {
 
-	temp := getAllFiles(refDir)
-	testFiles := filterOutFiles(temp, ".gitignore")
+	testFiles := getAllFiles(refDir)
+	testFiles = filterOutFiles(testFiles, ".gitignore")
+	testFiles = filterOutFiles(testFiles, ".directory")
 
 	results := make(chan testResult)
 
