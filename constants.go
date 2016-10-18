@@ -14,10 +14,11 @@ const (
 	asmoExt = ".asmo"
 	txtExt  = ".txt"
 
-	build = "build"
-	asm   = "asm"
-	run   = "run"
-	asmo  = "asmo"
+	build  = "build"
+	asm    = "asm"
+	run    = "run"
+	asmo   = "asmo"
+	buildo = "buildo"
 
 	open              = "open"
 	xdgOpen           = "xdg-open"

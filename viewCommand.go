@@ -14,31 +14,36 @@ func viewCommand(flags viewFlags, testname string) {
 	if flags.asm {
 		phase := asm
 		color.Cyan("ASM...")
-		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
+		viewOutput(phase, flags.testSet, testname, flags.diff)
 	}
 	if flags.build {
 		phase := build
 		color.Cyan("BUILD...")
-		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
+		viewOutput(phase, flags.testSet, testname, flags.diff)
 	}
 	if flags.run {
 		phase := run
 		color.Cyan("RUN...")
-		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
+		viewOutput(phase, flags.testSet, testname, flags.diff)
+	}
+	if flags.testSet == "codegenerator" && (flags.asmo || flags.buildo) {
+		color.Magenta("there is no reoptimize phase for the codegenerator")
+		return
 	}
 	if flags.asmo {
-		if flags.testSet == "codegenerator" {
-			color.Magenta("there is no reoptimize phase for the codegenerator")
-			return
-		}
 		phase := asmo
 		color.Cyan("ASMO...")
-		viewOutput(phase, flags.testSet, testname, flags.asm, flags.diff)
+		viewOutput(phase, flags.testSet, testname, flags.diff)
+	}
+	if flags.buildo {
+		phase := buildo
+		color.Cyan("ASMO...")
+		viewOutput(phase, flags.testSet, testname, flags.diff)
 	}
 }
 
 // TODO need to take into account asmo files
-func viewOutput(phase, testSet, testname string, isAsm bool, diff bool) {
+func viewOutput(phase, testSet, testname string, diff bool) {
 	var resultPath, expectPath string
 	if phase == asm || phase == asmo {
 		if testSet == "optimizer" || testSet == "optimizer-standalone" ||
