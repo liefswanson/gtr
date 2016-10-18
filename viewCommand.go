@@ -15,19 +15,16 @@ func viewCommand(flags viewFlags, testname string) {
 	if flags.test {
 		color.Cyan("TEST...")
 		path := ""
-		testType := ""
 		if flags.testSet == optimizerStandalone {
 			path = buildPath(asmDir, testname+".asm")
-			testType = "asm"
 		} else {
 			path = buildPath(pikaDir, testname+".pika")
-			testType = "pika"
 		}
 
 		if !exists(path) {
-			color.Magenta("the " + testType + " test " + testname + " could not be found")
 			color.Magenta(path + " does not exist")
 			os.Exit(1)
+			return
 		}
 		bytes, err := ioutil.ReadFile(path)
 		crashOnError(err)
