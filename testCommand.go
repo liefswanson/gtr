@@ -64,7 +64,7 @@ func testCommand(flags testFlags) {
 		batchRunOptimizedStandalone(flags.threads)
 		if flags.reoptimize {
 			color.Yellow("reoptimizing...")
-			batchOptimizeStandalone(flags.threads)
+			batchReoptimizeOptimizeStandalone(flags.threads)
 		}
 	}
 	end := time.Now().UnixNano()

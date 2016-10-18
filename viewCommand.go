@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -11,6 +12,27 @@ import (
 )
 
 func viewCommand(flags viewFlags, testname string) {
+	if flags.test {
+		color.Cyan("TEST...")
+		path := ""
+		testType := ""
+		if flags.testSet == optimizerStandalone {
+			path = buildPath(asmDir, testname+".asm")
+			testType = "asm"
+		} else {
+			path = buildPath(pikaDir, testname+".pika")
+			testType = "pika"
+		}
+
+		if !exists(path) {
+			color.Magenta("the " + testType + " test " + testname + " could not be found")
+			color.Magenta(path + " does not exist")
+			os.Exit(1)
+		}
+		bytes, err := ioutil.ReadFile(path)
+		crashOnError(err)
+		fmt.Print(string(bytes))
+	}
 	if flags.asm {
 		phase := asm
 		color.Cyan("ASM...")
@@ -26,7 +48,7 @@ func viewCommand(flags viewFlags, testname string) {
 		color.Cyan("RUN...")
 		viewOutput(phase, flags.testSet, testname, flags.diff)
 	}
-	if flags.testSet == "codegenerator" && (flags.asmo || flags.buildo) {
+	if flags.testSet == codegenerator && (flags.asmo || flags.buildo) {
 		color.Magenta("there is no reoptimize phase for the codegenerator")
 		return
 	}
@@ -46,7 +68,7 @@ func viewCommand(flags viewFlags, testname string) {
 func viewOutput(phase, testSet, testname string, diff bool) {
 	var resultPath, expectPath string
 	if phase == asm || phase == asmo {
-		if testSet == "optimizer" || testSet == "optimizer-standalone" ||
+		if testSet == optimizer || testSet == optimizerStandalone ||
 			phase == asmo {
 			resultPath = buildPath(resultDir, phase, testSet, testname+asmoExt)
 			expectPath = buildPath(expectDir, phase, testSet, testname+asmoExt)

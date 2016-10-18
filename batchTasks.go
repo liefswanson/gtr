@@ -19,7 +19,7 @@ func batchCodeGen(count int) {
 		pikaDir, pikaExt,
 		result.build.codegenerator, txtExt,
 		result.asm.codegenerator,
-		java, codegenerator)
+		java, codegeneratorArgs)
 
 	compareAllResults(count,
 		result.build.codegenerator,
@@ -33,7 +33,7 @@ func batchRunUnoptimized(count int) {
 		result.asm.codegenerator, asmExt,
 		result.run.codegenerator, txtExt,
 		"",
-		wine, emulator)
+		wine, emulatorArgs)
 
 	compareAllResults(count,
 		result.run.codegenerator,
@@ -47,7 +47,7 @@ func batchOptimize(count int) {
 		result.asm.codegenerator, asmExt,
 		result.build.optimizer, txtExt,
 		result.asm.optimizer,
-		java, optimizer)
+		java, optimizerArgs)
 
 	compareAllResults(count,
 		result.build.optimizer,
@@ -62,7 +62,7 @@ func batchReoptimizeOptimize(count int) {
 		result.asm.optimizer, asmoExt,
 		result.buildo.optimizer, txtExt,
 		result.asmo.optimizer,
-		java, optimizer)
+		java, optimizerArgs)
 
 	compareAllResults(count,
 		result.asmo.optimizer,
@@ -76,7 +76,7 @@ func batchRunOptimized(count int) {
 		result.asm.optimizer, asmoExt,
 		result.run.optimizer, txtExt,
 		"",
-		wine, emulator)
+		wine, emulatorArgs)
 
 	compareAllResults(count,
 		result.run.optimizer,
@@ -90,7 +90,7 @@ func batchCompile(count int) {
 		pikaDir, pikaExt,
 		result.build.compiler, txtExt,
 		result.asm.compiler,
-		java, compiler)
+		java, compilerArgs)
 
 	compareAllResults(count,
 		result.build.compiler,
@@ -105,7 +105,7 @@ func batchReoptimizeCompile(count int) {
 		result.asm.compiler, asmExt,
 		result.buildo.compiler, txtExt,
 		result.asmo.compiler,
-		java, optimizer)
+		java, optimizerArgs)
 
 	compareAllResults(count,
 		result.asmo.compiler,
@@ -119,7 +119,7 @@ func batchRunCompiled(count int) {
 		result.asm.compiler, asmExt,
 		result.run.compiler, txtExt,
 		"",
-		wine, emulator)
+		wine, emulatorArgs)
 
 	compareAllResults(count,
 		result.run.compiler,
@@ -133,12 +133,12 @@ func batchOptimizeStandalone(count int) {
 		asmDir, asmExt,
 		result.build.optimizerStandalone, txtExt,
 		result.asm.optimizerStandalone,
-		java, optimizer)
+		java, optimizerArgs)
 
 	compareAllResults(count,
 		result.build.optimizerStandalone,
 		expect.build.optimizerStandalone,
-		result.asm.optimizerStandalone,
+		asmDir,
 		txtExt)
 }
 
@@ -148,7 +148,7 @@ func batchReoptimizeOptimizeStandalone(count int) {
 		result.asm.optimizerStandalone, asmoExt,
 		result.buildo.optimizerStandalone, txtExt,
 		result.asmo.optimizerStandalone,
-		java, optimizer)
+		java, optimizerArgs)
 
 	compareAllResults(count,
 		result.asmo.optimizerStandalone,
@@ -162,7 +162,7 @@ func batchRunOptimizedStandalone(count int) {
 		result.asm.optimizerStandalone, asmoExt,
 		result.run.optimizerStandalone, txtExt,
 		"",
-		wine, emulator)
+		wine, emulatorArgs)
 
 	compareAllResults(count,
 		result.run.optimizerStandalone,

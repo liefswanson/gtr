@@ -20,6 +20,11 @@ const (
 	asmo   = "asmo"
 	buildo = "buildo"
 
+	compiler            = "compiler"
+	codegenerator       = "codegenerator"
+	optimizer           = "optimizer"
+	optimizerStandalone = "optimizer-standalone"
+
 	open              = "open"
 	xdgOpen           = "xdg-open"
 	java              = "java"
@@ -37,10 +42,10 @@ const (
 // these are vars, but just as a technical restriction
 // they should be considered constants
 var (
-	compiler      = []string{"-ea", "-jar", binDir + "/" + compilerName}
-	codegenerator = []string{"-ea", "-jar", binDir + "/" + codegeneratorName}
-	optimizer     = []string{"-ea", "-jar", binDir + "/" + optimizerName}
-	emulator      = []string{binDir + "/ASMEmu.exe"}
+	compilerArgs      = []string{"-ea", "-jar", binDir + "/" + compilerName}
+	codegeneratorArgs = []string{"-ea", "-jar", binDir + "/" + codegeneratorName}
+	optimizerArgs     = []string{"-ea", "-jar", binDir + "/" + optimizerName}
+	emulatorArgs      = []string{binDir + "/ASMEmu.exe"}
 
 	// TODO reoptimize
 	result = testDirTree{

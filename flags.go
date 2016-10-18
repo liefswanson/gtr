@@ -17,7 +17,7 @@ type testFlags struct {
 	optimize           bool
 	optimizeStandalone bool
 
-	reoptimize bool // TODO
+	reoptimize bool
 
 	clean bool
 
@@ -93,7 +93,7 @@ func makeViewFlags(args []string) (viewFlags, string) {
 	view.BoolVar(&flags.test, "test", false,
 		"view the source of the test which was run")
 
-	view.StringVar(&flags.testSet, "test-set", "optimizer",
+	view.StringVar(&flags.testSet, "test-set", compiler,
 		"particular set of tests to view\n"+
 			"\tvalues:\n"+
 			"\tcodegenerator, compiler, optimizer, optimizer-standalone")
