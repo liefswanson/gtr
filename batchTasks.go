@@ -22,10 +22,9 @@ func batchCodeGen(count int) {
 		java, codegeneratorArgs)
 
 	compareAllResults(count,
-		result.build.codegenerator,
-		expect.build.codegenerator,
-		pikaDir,
-		txtExt)
+		result.build.codegenerator, txtExt,
+		expect.build.codegenerator, txtExt,
+		pikaDir)
 }
 
 func batchRunUnoptimized(count int) {
@@ -36,10 +35,9 @@ func batchRunUnoptimized(count int) {
 		wine, emulatorArgs)
 
 	compareAllResults(count,
-		result.run.codegenerator,
-		expect.run.codegenerator,
-		result.asm.codegenerator,
-		txtExt)
+		result.run.codegenerator, txtExt,
+		expect.run.codegenerator, txtExt,
+		result.asm.codegenerator)
 }
 
 func batchOptimize(count int) {
@@ -50,10 +48,9 @@ func batchOptimize(count int) {
 		java, optimizerArgs)
 
 	compareAllResults(count,
-		result.build.optimizer,
-		expect.build.optimizer,
-		result.asm.codegenerator,
-		txtExt)
+		result.build.optimizer, txtExt,
+		expect.build.optimizer, txtExt,
+		result.asm.codegenerator)
 }
 
 // TODO reoptimize
@@ -65,10 +62,9 @@ func batchReoptimizeOptimize(count int) {
 		java, optimizerArgs)
 
 	compareAllResults(count,
-		result.asmo.optimizer,
-		expect.asmo.optimizer,
-		result.asm.optimizer,
-		asmoExt)
+		result.asmo.optimizer, asmoExt,
+		expect.asmo.optimizer, asmoExt,
+		result.asm.optimizer)
 }
 
 func batchRunOptimized(count int) {
@@ -79,10 +75,9 @@ func batchRunOptimized(count int) {
 		wine, emulatorArgs)
 
 	compareAllResults(count,
-		result.run.optimizer,
-		expect.run.optimizer,
-		result.asm.optimizer,
-		txtExt)
+		result.run.optimizer, txtExt,
+		expect.run.optimizer, txtExt,
+		result.asm.optimizer)
 }
 
 func batchCompile(count int) {
@@ -93,10 +88,9 @@ func batchCompile(count int) {
 		java, compilerArgs)
 
 	compareAllResults(count,
-		result.build.compiler,
-		expect.build.compiler,
-		pikaDir,
-		txtExt)
+		result.build.compiler, txtExt,
+		expect.build.compiler, txtExt,
+		pikaDir)
 }
 
 // TODO
@@ -108,10 +102,9 @@ func batchReoptimizeCompile(count int) {
 		java, optimizerArgs)
 
 	compareAllResults(count,
-		result.asmo.compiler,
-		expect.asmo.compiler,
-		result.asm.compiler,
-		asmoExt)
+		result.asmo.compiler, asmoExt,
+		expect.asmo.compiler, asmoExt,
+		result.asm.compiler)
 }
 
 func batchRunCompiled(count int) {
@@ -122,11 +115,13 @@ func batchRunCompiled(count int) {
 		wine, emulatorArgs)
 
 	compareAllResults(count,
-		result.run.compiler,
-		expect.run.compiler,
-		result.asm.compiler,
-		txtExt)
+		result.run.compiler, txtExt,
+		expect.run.compiler, txtExt,
+		result.asm.compiler)
 }
+
+// TODO run once in the beginning to check that you have the same result
+// TODO add several directories for extra run phases, that check against results
 
 func batchOptimizeStandalone(count int) {
 	executeAll(count,
@@ -136,10 +131,9 @@ func batchOptimizeStandalone(count int) {
 		java, optimizerArgs)
 
 	compareAllResults(count,
-		result.build.optimizerStandalone,
-		expect.build.optimizerStandalone,
-		asmDir,
-		txtExt)
+		result.build.optimizerStandalone, txtExt,
+		expect.build.optimizerStandalone, txtExt,
+		asmDir)
 }
 
 // TODO
@@ -151,10 +145,9 @@ func batchReoptimizeOptimizeStandalone(count int) {
 		java, optimizerArgs)
 
 	compareAllResults(count,
-		result.asmo.optimizerStandalone,
-		expect.asmo.optimizerStandalone,
-		result.asm.optimizerStandalone,
-		asmoExt)
+		result.asmo.optimizerStandalone, asmoExt,
+		result.asm.optimizerStandalone, asmExt,
+		result.asm.optimizerStandalone)
 }
 
 func batchRunOptimizedStandalone(count int) {
@@ -165,10 +158,9 @@ func batchRunOptimizedStandalone(count int) {
 		wine, emulatorArgs)
 
 	compareAllResults(count,
-		result.run.optimizerStandalone,
-		expect.run.optimizerStandalone,
-		result.asm.optimizerStandalone,
-		txtExt)
+		result.run.optimizerStandalone, txtExt,
+		expect.run.optimizerStandalone, txtExt,
+		result.asm.optimizerStandalone)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +231,9 @@ func execute(cmd string, args []string) []byte {
 ////////////////////////////////////////////////////////////////////////////////
 // comparison
 func compareAllResults(count int,
-	resultDir, expectDir, refDir, ext string) {
+	resultDir, resExt,
+	expectDir, expExt,
+	refDir string) {
 
 	testFiles := getAllFiles(refDir)
 	testFiles = filterOutFiles(testFiles, ".gitignore")
@@ -250,7 +244,7 @@ func compareAllResults(count int,
 	for i := 0; i < count; i++ {
 		start, end := measureSlice(len(testFiles), count, i)
 		slice := testFiles[start:end]
-		go compareEachResult(slice, results, resultDir, expectDir, ext)
+		go compareEachResult(slice, results, resultDir, resExt, expectDir, expExt)
 	}
 
 	passed := 0
@@ -282,12 +276,13 @@ func compareAllResults(count int,
 }
 
 func compareEachResult(files []os.FileInfo, results chan testResult,
-	resultDir, expectDir, ext string) {
+	resultDir, resExt,
+	expectDir, expExt string) {
 	for _, file := range files {
-		resultFileName := replaceExtension(file.Name(), ext)
+		resultFileName := replaceExtension(file.Name(), resExt)
 		resultFilePath := buildPath(resultDir, resultFileName)
 
-		expectFileName := replaceExtension(file.Name(), ext)
+		expectFileName := replaceExtension(file.Name(), resExt)
 		expectFilePath := buildPath(expectDir, expectFileName)
 
 		results <- testResult{
