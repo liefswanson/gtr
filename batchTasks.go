@@ -146,7 +146,7 @@ func batchReoptimizeOptimizeStandalone(count int) {
 
 	compareAllResults(count,
 		result.asmo.optimizerStandalone, asmoExt,
-		result.asm.optimizerStandalone, asmExt,
+		expect.asm.optimizerStandalone, asmExt,
 		result.asm.optimizerStandalone)
 }
 
